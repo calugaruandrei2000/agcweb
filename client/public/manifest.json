@@ -1,0 +1,26 @@
+{
+  "name": "AGC Web - Soluții Web Profesionale",
+  "short_name": "AGC Web",
+  "description": "Soluții web profesionale pentru afacerea ta. Creare magazine online, e-commerce, site-uri de prezentare.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/favicon-48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
