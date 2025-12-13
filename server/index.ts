@@ -25,13 +25,11 @@ export async function registerRoutes(_server: any, app: Express) {
       await transporter.verify();
 
       await transporter.sendMail({
-  from: `"AGC Web Contact" <${process.env.MAIL_USER}>`,
-  to: "andreicalugaru2000@gmail.com", // 👈 GMAIL, nu Outlook
-  replyTo: email,
-  subject: "TEST – Mesaj nou din formular",
-  text: `Test email`
-});
-
+        from: `"AGC Web Contact" <${process.env.MAIL_USER}>`,
+        to: "agcweb@outlook.com",
+        subject: "Mesaj nou de pe site – AGC Web",
+        replyTo: email,
+        text: `
 Mesaj nou primit de pe formularul de contact
 
 Nume: ${name}
