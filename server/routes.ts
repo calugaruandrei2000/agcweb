@@ -6,38 +6,50 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { Resend } from "resend";
 
-// Initialize Resend client using environment variable
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function registerRoutes(app: Express, httpServer: Server): Promise<Server> {
-
-  // Contact form endpoint
+  
+  // Endpoint pentru contact
   app.post("/api/contact", async (req, res) => {
+    console.log("[contact] Request received:", req.body);
+
     try {
+      // Validare date
       const validatedData = insertContactMessageSchema.parse(req.body);
+      console.log("[contact] Data validated:", validatedData);
 
-      // Create message in your storage
+      // Creare mesaj in storage
       const message = await storage.createContactMessage(validatedData);
+      console.log("[contact] Message stored:", message);
 
-      // Send email via Resend
-      await resend.emails.send({
-        from: "agcweb@outlook.com", // sau orice email valid verificat pe Resend
-        to: "agcweb@outlook.com",   // poți folosi adresa destinatarului
-        subject: `Mesaj nou de la ${validatedData.name}`,
-        html: `<p>${validatedData.message}</p><p>Email: ${validatedData.email}</p>`
-      });
+      // Trimitere email
+      try {
+        console.log("[contact] Sending email via Resend...");
+        const emailResponse = await resend.emails.send({
+          from: "agcweb@outlook.com",
+          to: validatedData.email,
+          subject: "Mesaj primit",
+          html: `<p>Salut ${validatedData.name},</p><p>Am primit mesajul tău: ${validatedData.message}</p>`
+        });
+        console.log("[contact] Email sent successfully:", emailResponse);
+      } catch (emailErr) {
+        console.error("[contact] Error sending email:", emailErr);
+      }
 
       res.status(201).json({
         success: true,
         message: "Mesajul a fost trimis cu succes!",
         data: message
       });
+
     } catch (error) {
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
+        console.log("[contact] Validation error:", validationError.message);
         res.status(400).json({ success: false, error: validationError.message });
       } else {
-        console.error("CONTACT EMAIL ERROR:", error);
+        console.error("[contact] Unknown error:", error);
         res.status(500).json({
           success: false,
           error: "A apărut o eroare. Vă rugăm încercați din nou."
@@ -46,17 +58,19 @@ export async function registerRoutes(app: Express, httpServer: Server): Promise<
     }
   });
 
-  // Get all contact messages (for admin purposes)
+  // Endpoint pentru preluare mesaje contact (pentru admin)
   app.get("/api/contact", async (_req, res) => {
+    console.log("[contact] GET request for messages");
+
     try {
       const messages = await storage.getContactMessages();
+      console.log("[contact] Messages fetched:", messages.length);
       res.json(messages);
     } catch (error) {
-      console.error("Error fetching contact messages:", error);
+      console.error("[contact] Error fetching messages:", error);
       res.status(500).json({ success: false, error: "A apărut o eroare." });
     }
   });
 
   return httpServer;
 }
-
