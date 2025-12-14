@@ -15,7 +15,7 @@ async function startServer() {
     const publicPath = path.join(process.cwd(), "dist", "public");
     app.use(express.static(publicPath));
 
-    await registerRoutes(server, app);
+    await registerRoutes(app, server);
 
     const PORT = process.env.PORT || 5000;
     server.listen(PORT, () => {
